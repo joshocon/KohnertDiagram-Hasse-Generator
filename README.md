@@ -1,2 +1,3 @@
-# KohnertDiagram-Hasse-Generator
-This project generates the Hasse diagram as a Tikz picture in LaTeX from a from a text file.
+# Southeast-Poset-Generator
+
+This code generates LaTex code to draw a Hasse diagram of a Kohnert poset. The Hasse diagram can be a little messy and need manual tweaking. 

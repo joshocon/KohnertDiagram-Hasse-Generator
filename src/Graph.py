@@ -35,7 +35,6 @@ class Graph:
         return self.graph.get(self._wrap(vertex), [])
     
     def get_root_node(self):
-        # Return the first node inserted, assuming it's the root
         return next(iter(self.graph.keys()), None)
 
     def all_nodes(self):
@@ -43,5 +42,25 @@ class Graph:
     
     def get_vertices(self):
         return self.graph.keys()
+    
+    def get_all_neighbors(self):
+        return self.graph.values()
+    
+    def get_all_items(self):
+        return self.graph.items()
+    
+    def __repr__(self):
+        string = ''
+        for vertex in self.get_vertices():
+           string += f'\nVertex: {vertex} Neighbors: '
+           for neighbor in self.get_neighbors(vertex):
+                string += f'{neighbor}'
+            
+        return string
+    
+
+                
+                    
+
 
 

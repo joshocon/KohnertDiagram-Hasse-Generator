@@ -1,0 +1,63 @@
+
+    \documentclass{article}
+    \usepackage{graphicx, geometry, amsmath, amsfonts, tikz, youngtab, cite}
+    \geometry{left=2cm, right=2cm}
+    \savebox2{%
+    \begin{picture}(12,12)
+    \put(0,0){\line(1,0){12}}
+    \put(0,0){\line(0,1){12}}
+    \put(12,0){\line(0,1){12}}
+    \put(0,12){\line(1,0){12}}
+    \end{picture}}
+    \newcommand\cover{\mathrel{\ooalign{$\prec$\cr
+    \hidewidth\hbox{$\cdot\mkern0.5mu$}\cr}}}
+    \newlength\cellsize
+    \setlength\cellsize{12pt} 
+    \newcommand\cellify[1]{\def\thearg{#1}\def\nothing{}%
+    \ifx\thearg\nothing\vrule width0pt height\cellsize depth0pt%
+    \else\hbox to 0pt{\usebox2\hss}\fi%
+    \vbox to 12\unitlength{\vss\hbox to 12\unitlength{\hss$#1$\hss}\vss}}
+    \newcommand\tableau[1]{\vtop{\let\\=\cr
+    \setlength\baselineskip{-12000pt}
+    \setlength\lineskiplimit{12000pt}
+    \setlength\lineskip{0pt}
+    \halign{&\cellify{##}\cr#1\crcr}}}
+    \savebox4{% CIRCLE
+    \begin{picture}(12,12)
+    \put(6,6){\circle{12}}
+    \end{picture}}
+    \newcommand{\cir}[1]{\def\thearg{#1}\def\nothing{}%
+    \ifx\thearg\nothing\vrule width0pt height\cellsize depth0pt%
+    \else\hbox to 0pt{\usebox4\hss}\fi%
+    \vbox to 12\unitlength{\vss\hbox to 12\unitlength{\hss$#1$\hss}\vss}}
+    \newcommand\nocellify[1]{\def\thearg{#1}\def\nothing{}%
+    \ifx\thearg\nothing\vrule width0pt height\cellsize depth0pt%
+    \else\hbox to 0pt{\hss}\fi%
+    \vbox to 12\unitlength{\vss\hbox to 12\unitlength{\hss$#1$\hss}\vss}}
+    \newcommand\notableau[1]{\vtop{\let\\=\cr
+    \setlength\baselineskip{-12000pt}
+    \setlength\lineskiplimit{12000pt}
+    \setlength\lineskip{0pt}
+    \halign{&\nocellify{##}\cr#1\crcr}}}
+    \title{Code Generation of Posets}
+    \begin{document}
+    \maketitle \begin{figure}[ht]\centering\begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]
+\node (b8c25aeb714fbc35bfbd4bf8b6283e1a) at (5.0, 10.0) {\vline\tableau{ & \times & \\ \times & \times & \times\\  &  & \\ \hline} \hspace{3\cellsize}};
+\node (2ca62f7c9a68052bc9e664588890cf31) at (4.0, 7.0) {\vline\tableau{ & \times & \\ \times & \times & \\  &  & \times\\ \hline} \hspace{3\cellsize}};
+\node (ec6ee9def2322b438d13a3c67f75ed45) at (5.0, 3.0) {\vline\tableau{ &  & \\ \times & \times & \\  & \times & \times\\ \hline} \hspace{3\cellsize}};
+\node (c26bf1afb80cafe6daa25da1b9fc7c50) at (2.0, 5.0) {\vline\tableau{ & \times & \\ \times &  & \\  & \times & \times\\ \hline} \hspace{3\cellsize}};
+\node (86b736618e4549410587b5b371c7dfe6) at (1.0, 3.0) {\vline\tableau{ & \times & \\  &  & \\ \times & \times & \times\\ \hline} \hspace{3\cellsize}};
+\node (81f7dd97ae016495382ef07188224efa) at (1.0, 0.0) {\vline\tableau{ &  & \\  & \times & \\ \times & \times & \times\\ \hline} \hspace{3\cellsize}};
+\node (4a6807294591aa30e78f49a21ce1edbf) at (6.0, 5.0) {\vline\tableau{ &  & \\ \times & \times & \times\\  & \times & \\ \hline} \hspace{3\cellsize}};
+\draw (b8c25aeb714fbc35bfbd4bf8b6283e1a) -- (2ca62f7c9a68052bc9e664588890cf31);
+\draw (b8c25aeb714fbc35bfbd4bf8b6283e1a) -- (4a6807294591aa30e78f49a21ce1edbf);
+\draw (2ca62f7c9a68052bc9e664588890cf31) -- (ec6ee9def2322b438d13a3c67f75ed45);
+\draw (2ca62f7c9a68052bc9e664588890cf31) -- (c26bf1afb80cafe6daa25da1b9fc7c50);
+\draw (c26bf1afb80cafe6daa25da1b9fc7c50) -- (ec6ee9def2322b438d13a3c67f75ed45);
+\draw (c26bf1afb80cafe6daa25da1b9fc7c50) -- (86b736618e4549410587b5b371c7dfe6);
+\draw (86b736618e4549410587b5b371c7dfe6) -- (81f7dd97ae016495382ef07188224efa);
+\draw (4a6807294591aa30e78f49a21ce1edbf) -- (ec6ee9def2322b438d13a3c67f75ed45);
+\end{tikzpicture}\caption{\label{fig:poset}Hasse Diagram of $D_0 = \{[(2, 1), (2, 2), (2, 3), (3, 2)]\}$. Bounded: False. Ranked: False }\end{figure}\pagebreak\begin{figure}[ht]\centering\begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]
+\node (5728bf14829d282842809edddf51aceb) at (1.0, 0.0) {\vline\tableau{\times &  & \\ \times & \times & \times\\ \hline} \hspace{3\cellsize}};
+
+\end{tikzpicture}\caption{\label{fig:poset}Hasse Diagram of $D_0 = \{[(1, 1), (1, 2), (1, 3), (2, 1)]\}$. Bounded: True. Ranked: True }\end{figure}\pagebreak\end{document}

@@ -80,11 +80,14 @@ class KohnertDiagramEngine:
             if key in cache:
                 existing = cache[key]
                 graph.add_edge(diagram, existing)
+                graph.add_vertex(existing)
             else:
                 # else, set the parent of the new_diagram to the initial diagram, add it to the child list, and add it to the cache.
                 graph.add_edge(diagram, new_diagram)
                 cache[key] = new_diagram
+                graph.add_vertex(new_diagram)
                 # find move eligible cells for the new diagram, and recurse
                 move_cells = self.find_move_cells(new_diagram)
                 for next_cell in move_cells:
                     self.kohnert_move(graph, new_diagram, next_cell, cache)
+

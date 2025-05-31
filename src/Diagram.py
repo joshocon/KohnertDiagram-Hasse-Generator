@@ -20,9 +20,6 @@ class Diagram:
         sorted_cells = sorted(cells)
         cell_str = str(sorted_cells)
         return hashlib.md5(cell_str.encode()).hexdigest()
-    
-    def generate_monomial(self):
-        print(self.row_weight)
 
     def get_row_weight(self):
         weight = {}

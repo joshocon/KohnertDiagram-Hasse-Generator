@@ -6,6 +6,7 @@ McNair Scholar's Program 2025
 
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
+from Poset import Poset
 
 class LaTeXRenderer:
     def __init__(self):
@@ -14,16 +15,16 @@ class LaTeXRenderer:
         
     def set_node_positions(self, graph):
             nx_graph = nx.DiGraph()
-            all_nodes = set(graph.graph.keys())
-            for children in graph.graph.values():
-                all_nodes.update(children)
+            all_nodes = set(graph.get_vertices())
+            for neighbor in graph.get_all_neighbors():
+                all_nodes.update(neighbor)
 
             for node in all_nodes:
                 nx_graph.add_node(node)
     
-            for parent, children in graph.graph.items():
-                for child in children:
-                    nx_graph.add_edge(parent, child)
+            for vertex, neighbors in graph.get_all_items():
+                for neighbor in neighbors:
+                    nx_graph.add_edge(vertex, neighbor)
     
             pos = graphviz_layout(nx_graph, prog='dot')
     
@@ -63,6 +64,16 @@ class LaTeXRenderer:
                     rf'\draw ({parent.entry.key}) -- ({child.entry.key});'
                 )
         return '\n'.join(draw_lines)
+    
+    def get_monomial_string(self, row_weight):
+        monomial = ''
+        for i in range(len(row_weight)):
+            if row_weight[i] != 0:
+                if row_weight[i] == 1:
+                    monomial += f'x_{i+1}'
+                else:
+                    monomial += f'x_{i+1}^{row_weight[i]}'
+        return monomial
 
     def generate_hasse_diagram(self, graph, root):
 
@@ -72,6 +83,7 @@ class LaTeXRenderer:
         )
         
         vertices = []
+        polynomial = []
         seen = set()
         #polynomial
         
@@ -84,8 +96,10 @@ class LaTeXRenderer:
 
             diagram.key = diagram.generate_diagram_key(diagram.cells)
             self.set_diagram_tex(node)
+            monomial = self.get_monomial_string(diagram.get_row_weight())
 
             vertices.append(node.entry.tex_string)
+            polynomial.append(monomial)
 
             for neighbor in graph.get_neighbors(node):
                 dfs(neighbor)
@@ -93,10 +107,11 @@ class LaTeXRenderer:
         dfs(root)
 
         edges = self.draw_edges(graph)
-
+        kohnert_poset = Poset(graph)
         figure_end_str = (
             rf"\end{{tikzpicture}}"
-            rf"\caption{{\label{{fig:poset}}Hasse Diagram of $D_0 = \{{{root.entry.cells}\}}$.}}" #with Kohnert Polynomial ${{{polynomial}}}$
+            rf"\caption{{\label{{fig:poset}}Hasse Diagram of $D_0 = \{{{root.entry.cells}\}}$. Bounded: {kohnert_poset.is_bounded()}. Ranked: {kohnert_poset.is_ranked()} }}" # with Kohnert Polynomial \\"
+            #rf"\begin{{tiny}}${{{'+'.join(polynomial)}}}$ \end{{tiny}}"
             rf"\end{{figure}}"
             rf"\pagebreak"
         )

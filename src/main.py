@@ -14,7 +14,7 @@ import subprocess
 def main():
     #get all Kohnert diagrams from diagrams.txt
     diagrams = []
-    with open('diagrams.txt', 'r') as file:
+    with open('../diagrams.txt', 'r') as file:
         data = file.readlines()
     
     for line in data:
@@ -83,7 +83,7 @@ def main():
         D_0 = graph.get_root_node()
         
         #if the diagram is invalid or not southeast then quit
-        if diagram.cells == [] or engine.check_south_east(diagram.cells) == False:
+        if diagram.cells == []:# or engine.check_south_east(diagram.cells) == False:
             print('Error')
         
         #if the diagram is valid, we continue
@@ -95,10 +95,8 @@ def main():
             
             renderer.set_node_positions(graph)
             latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0)
-            
             with open('main.tex', 'w') as f:
                 f.write(latex_start + latex_hasse_diagrams + latex_end)
-    
         # Compile LaTeX into PDF
         subprocess.run(['pdflatex', 'main.tex'])
         file.close

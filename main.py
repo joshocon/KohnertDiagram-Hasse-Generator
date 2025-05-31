@@ -101,11 +101,11 @@ def main():
             with open('main.tex', 'w') as f:
                 f.write(latex_start + latex_hasse_diagrams + latex_end)
                 
-        with open('latex_errors.log', 'w') as error_log:
-            subprocess.run(['pdflatex', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
-        
-            kohnert_poset = Poset(graph)
-            kohnert_poset.result()
+            with open('latex_errors.log', 'w') as error_log:
+                subprocess.run(['pdflatex', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
+            
+                kohnert_poset = Poset(graph)
+                kohnert_poset.result()
             
         file.close
         

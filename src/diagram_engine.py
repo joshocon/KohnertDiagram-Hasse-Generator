@@ -5,9 +5,9 @@ McNair Scholar's Program 2025
 '''
 
 import copy
-from Diagram import Diagram
+from .diagram import Diagram
 
-class KohnertDiagramEngine:
+class DiagramEngine:
     
     def get_dimension(self, cells):
         row_num = 0

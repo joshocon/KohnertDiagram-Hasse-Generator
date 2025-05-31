@@ -4,7 +4,7 @@ University of Kansas
 McNair Scholar's Program 2025
 '''
 
-from Node import Node
+from .node import Node
 
 class Graph:
     def __init__(self):

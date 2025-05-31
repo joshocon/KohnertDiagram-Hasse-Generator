@@ -6,7 +6,7 @@ McNair Scholar's Program 2025
 
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
-from Poset import Poset
+from .poset import Poset
 
 class LaTeXRenderer:
     def __init__(self):

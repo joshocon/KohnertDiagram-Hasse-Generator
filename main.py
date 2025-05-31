@@ -4,11 +4,7 @@ University of Kansas
 McNair Scholar's Program 2025
 '''
 
-from src.Diagram import Diagram
-from src.Graph import Graph
-from src.KohnertDiagramEngine import KohnertDiagramEngine
-from src.LaTeXRenderer import LaTeXRenderer
-from src.Poset import Poset
+from src import Diagram, Graph, DiagramEngine, LaTeXRenderer, Poset
 import subprocess
 
 
@@ -75,7 +71,7 @@ def main():
     
     for cells in diagrams:
         graph = Graph()
-        engine = KohnertDiagramEngine()
+        engine = DiagramEngine()
         renderer = LaTeXRenderer()
         
         row_num, col_num = engine.get_dimension(cells)
@@ -99,7 +95,7 @@ def main():
             latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0)
             
         
-            with open('/main.tex', 'w') as f:
+            with open('main.tex', 'w') as f:
                 f.write(latex_start + latex_hasse_diagrams + latex_end)
                 
         with open('latex_errors.log', 'w') as error_log:

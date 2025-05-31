@@ -49,7 +49,6 @@ class Poset:
     def result(self):
         graph = self.relations
         res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}. Ranked: {self.is_ranked()}'
-        print(res)
         return res
 
             

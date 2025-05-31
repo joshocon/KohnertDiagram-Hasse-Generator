@@ -105,7 +105,7 @@ def main():
                 subprocess.run(['pdflatex', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
             
             kohnert_poset = Poset(graph)
-            kohnert_poset.result()
+            print(kohnert_poset.result())
             
         file.close
         

@@ -13,7 +13,6 @@ class Diagram:
         self.col_num = col_num
         self.key = None
         self.row_weight = self.get_row_weight()
-        self.tex_string = ""
 
     # gives diagram a unique key
     def generate_diagram_key(self, cells):

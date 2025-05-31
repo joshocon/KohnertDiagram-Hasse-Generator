@@ -23,13 +23,13 @@ class Graph:
         if node not in self.graph:
             self.graph[node] = []
 
-    def add_edge(self, parent, child):
-        parent_node = self._wrap(parent)
-        child_node = self._wrap(child)
+    def add_edge(self, vertex, neighbor):
+        vertex_node = self._wrap(vertex)
+        neighbor_node = self._wrap(neighbor)
 
-        if parent_node not in self.graph:
-            self.graph[parent_node] = []
-        self.graph[parent_node].append(child_node)
+        if vertex_node not in self.graph:
+            self.graph[vertex_node] = []
+        self.graph[vertex_node].append(neighbor_node)
 
     def get_neighbors(self, vertex):
         return self.graph.get(self._wrap(vertex), [])

@@ -1,17 +1,21 @@
 class Poset:
     def __init__(self, graph):
         self.maximal_element = graph.get_root_node()
-        self.minimal_elements = self._find_minimal_elements(graph)
-        self.maximal_chains = self._find_all_maximal_chains(graph)
+        self.relations = graph
+        self.minimal_elements = self._find_minimal_elements()
+        self.maximal_chains = self._find_all_maximal_chains()
         
-    def _find_minimal_elements(self, graph):
+        
+    def _find_minimal_elements(self):
+        graph = self.relations
         minimal_elements = []
         for vertex in graph.get_vertices():
             if graph.get_neighbors(vertex) == []:
                 minimal_elements.append(vertex)
         return minimal_elements
     
-    def _find_all_maximal_chains(self, graph):
+    def _find_all_maximal_chains(self):
+        graph = self.relations
         root = graph.get_root_node()
         minimal_elements = self.get_minimal_elements()
 
@@ -19,14 +23,11 @@ class Poset:
 
         def dfs(node, path=[]):
             if node in minimal_elements:
-                print('Node is minimal - adding path')
                 all_paths.append(list(reversed(path + [node])))
                 return
             if node not in graph.get_vertices():
-                print('Node is not in graph')
                 return
             for neighbor in graph.get_neighbors(node):
-                print(f'Beginning DFS with neighbor: {neighbor}')
                 dfs(neighbor, path + [node])
 
         dfs(root)
@@ -44,5 +45,11 @@ class Poset:
     def is_ranked(self):
         expected_length = len(self.maximal_chains[0])
         return all(len(chain) == expected_length for chain in self.maximal_chains)
+    
+    def result(self):
+        graph = self.relations
+        res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}. Ranked: {self.is_ranked()}'
+        print(res)
+        return res
 
             

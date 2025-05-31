@@ -53,8 +53,8 @@ class LaTeXRenderer:
         string += r'\hline} \hspace{3\cellsize}};'
 
 
-        diagram.tex_string = string
-        return diagram.tex_string
+        node.tex_string = string
+        return node.tex_string
 
     def draw_edges(self, graph):
         draw_lines = []
@@ -98,7 +98,7 @@ class LaTeXRenderer:
             self.set_diagram_tex(node)
             monomial = self.get_monomial_string(diagram.get_row_weight())
 
-            vertices.append(node.entry.tex_string)
+            vertices.append(node.tex_string)
             polynomial.append(monomial)
 
             for neighbor in graph.get_neighbors(node):
@@ -115,7 +115,6 @@ class LaTeXRenderer:
             rf"\end{{figure}}"
             rf"\pagebreak"
         )
-
         return (
             figure_start_str
             + '\n'.join(vertices)

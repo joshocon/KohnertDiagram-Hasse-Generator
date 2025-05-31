@@ -20,59 +20,49 @@ class KohnertDiagramEngine:
         return [row_num, col_num]
 
     def check_south_east(self, cells):
-            for i in range(len(cells)):
-                for j in range(len(cells)):
-                    if i != j:
-                        if (
-                            min(cells[i][0], cells[j][0]),
-                            max(cells[i][1], cells[j][1]),
-                        ) not in cells:
-                            return False
-            return True
+        cells_set = set(cells)
+        for i in range(len()):
+            for j in range(i + 1, len(cells)):
+                if (
+                    min(cells[i][0], cells[j][0]),
+                    max(cells[i][1], cells[j][1]),
+                ) not in cells_set:
+                    return False
+        return True
 
     def find_move_cells(self, D):
-            diagram = D
-            cells = set(diagram.cells)
-            max_cells = {}
-
-            # build dictionary whose key is the row and value is the furthest right cell in that row
-            for row, col in cells:
-                if row not in max_cells or col > max_cells[row][1]:
-                    max_cells[row] = (row, col)
-
-            moveable = []
-            # for the furthest right cell in each row, is it moveable? meaning is there an empty space beneath it in its column
-            # checks each from starting at r-1 to 0 for an empty space
-            for cell in max_cells.values():
-                row, col = cell
-
-                for r in range(row - 1, 0, -1):
-                    if (r, col) not in cells:
-                        moveable.append(cell)
-                        break  # once we know an open spot exists, break
-            return moveable
+        diagram = D
+        cells = set(diagram.cells)
+        max_cells = {}
+        # build dictionary whose key is the row and value is the furthest right cell in that row
+        for row, col in cells:
+            if row not in max_cells or col > max_cells[row][1]:
+                max_cells[row] = (row, col)
+        moveable = []
+        # for the furthest right cell in each row, is it moveable? meaning is there an empty space beneath it in its column
+        # checks each from starting at r-1 to 0 for an empty space
+        for cell in max_cells.values():
+            row, col = cell
+            for r in range(row - 1, 0, -1):
+                if (r, col) not in cells:
+                    moveable.append([cell, (r,col)])
+                    break  # once we know an open spot exists, break - moveable contains lists in the form [cell_to_be_moved, new_cell_position]
+        return moveable
         
-    def kohnert_move(self, graph, diagram, cell, cache=None):
+    def kohnert_move(self, graph, diagram, move_pair, cache=None):
             if cache is None:
                 cache = {}
+                
+            cell = move_pair[0]
+            new_cell = move_pair[1]
 
             # initialize new_diagram and set its cells = cells in initial diagram parameter
             new_cells = copy.copy(diagram.cells)
             new_diagram = Diagram(new_cells, diagram.row_num, diagram.col_num)
             new_diagram.cells.remove(cell)  # remove the cell we are going to move
 
-            row, col = cell
-            target_row = None
-            # we find the first open spot in the same way we did in the find_move_cells method
-            for r in range(row - 1, 0, -1):
-                if (r, col) not in diagram.cells:
-                    target_row = r
-                    break
-            # failsafe
-            if target_row is None:
-                return
-
-            # append new cell
+            target_row, col = new_cell
+            
             new_diagram.cells.append((target_row, col))
 
             key = frozenset(new_diagram.cells)
@@ -87,7 +77,7 @@ class KohnertDiagramEngine:
                 cache[key] = new_diagram
                 graph.add_vertex(new_diagram)
                 # find move eligible cells for the new diagram, and recurse
-                move_cells = self.find_move_cells(new_diagram)
-                for next_cell in move_cells:
-                    self.kohnert_move(graph, new_diagram, next_cell, cache)
+                new_move_cells = self.find_move_cells(new_diagram)
+                for new_move_pair in new_move_cells:
+                    self.kohnert_move(graph, new_diagram, new_move_pair, cache)
 

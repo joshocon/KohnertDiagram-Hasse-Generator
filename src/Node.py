@@ -9,6 +9,7 @@ class Node:
         self.entry = entry
         self.draw_string = ''
         self.pos = ()
+        self.tex_string = ""
 
     def __eq__(self, other):
         return isinstance(other, Node) and self.entry == other.entry

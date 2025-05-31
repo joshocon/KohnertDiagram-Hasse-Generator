@@ -8,6 +8,7 @@ from Diagram import Diagram
 from Graph import Graph
 from KohnertDiagramEngine import KohnertDiagramEngine
 from LaTeXRenderer import LaTeXRenderer
+from Poset import Poset
 import subprocess
 
 
@@ -90,16 +91,25 @@ def main():
         else:
             cache = {}  # cache Kohnert diagrams
             move_cells = engine.find_move_cells(diagram)  # find cells eligible for Kohnert move
-            for cell in move_cells:
-                engine.kohnert_move(graph, diagram, cell, cache)
+            for move_pair in move_cells:
+                engine.kohnert_move(graph, diagram, move_pair, cache)
             
+            #significatly faster to comment out the writing and compiling of latex - the print messages will be enough information for most cases
             renderer.set_node_positions(graph)
             latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0)
+            
+        
             with open('main.tex', 'w') as f:
                 f.write(latex_start + latex_hasse_diagrams + latex_end)
-        # Compile LaTeX into PDF
-        subprocess.run(['pdflatex', 'main.tex'])
+                
+        with open('latex_errors.log', 'w') as error_log:
+            subprocess.run(['pdflatex', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
+        
+            kohnert_poset = Poset(graph)
+            return kohnert_poset.result()
+            
         file.close
+        
 
 if __name__ == '__main__':
     main()

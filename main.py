@@ -77,6 +77,7 @@ def main():
         row_num, col_num = engine.get_dimension(cells)
         diagram = Diagram(list(cells), row_num, col_num)  # init diagram
         graph.add_vertex(diagram) #add "root" to graph
+        D_0 = graph.get_root_node()
         
         #if the diagram is invalid or not southeast then quit
         if diagram.cells == []:
@@ -93,15 +94,15 @@ def main():
                 engine.kohnert_move(graph, diagram, move_pair, cache)
             
             #significatly faster to comment out the writing and compiling of latex - the print messages will be enough information for most cases
-        #     renderer.set_node_positions(graph)
-        #     latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, diagram)
+            renderer.set_node_positions(graph)
+            latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0)
             
         
-        #     with open('main.tex', 'w') as f:
-        #         f.write(latex_start + latex_hasse_diagrams + latex_end)
+            with open('main.tex', 'w') as f:
+                f.write(latex_start + latex_hasse_diagrams + latex_end)
                 
-        # with open('latex_errors.log', 'w') as error_log:
-        #     subprocess.run(['pdflatex', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
+        with open('latex_errors.log', 'w') as error_log:
+            subprocess.run(['pdflatex', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
         
             kohnert_poset = Poset(graph)
             kohnert_poset.result()

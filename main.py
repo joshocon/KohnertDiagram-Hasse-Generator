@@ -18,8 +18,6 @@ def main():
         raw_cells = line.strip().split(' ')
         cells = [eval(cell) for cell in raw_cells ]
         diagrams.append(cells)
-    
-    print(diagrams)
         
     #latex boilerplate
     latex_start = r'''
@@ -81,8 +79,11 @@ def main():
         graph.add_vertex(diagram) #add "root" to graph
         
         #if the diagram is invalid or not southeast then quit
-        if diagram.cells == []:# or engine.check_south_east(diagram.cells) == False:
+        if diagram.cells == []:
             print('Error')
+        
+        elif engine.check_south_east(diagram.cells) == False:
+            print('Not Southeast')
         
         #if the diagram is valid, we continue
         else:

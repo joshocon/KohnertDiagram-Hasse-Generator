@@ -21,7 +21,7 @@ class DiagramEngine:
 
     def check_south_east(self, cells):
         cells_set = set(cells)
-        for i in range(len()):
+        for i in range(len(cells)):
             for j in range(i + 1, len(cells)):
                 if (
                     min(cells[i][0], cells[j][0]),

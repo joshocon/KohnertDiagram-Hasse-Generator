@@ -4,18 +4,18 @@ University of Kansas
 McNair Scholar's Program 2025
 '''
 
-from Diagram import Diagram
-from Graph import Graph
-from KohnertDiagramEngine import KohnertDiagramEngine
-from LaTeXRenderer import LaTeXRenderer
-from Poset import Poset
+from src.Diagram import Diagram
+from src.Graph import Graph
+from src.KohnertDiagramEngine import KohnertDiagramEngine
+from src.LaTeXRenderer import LaTeXRenderer
+from src.Poset import Poset
 import subprocess
 
 
 def main():
     #get all Kohnert diagrams from diagrams.txt
     diagrams = []
-    with open('../diagrams.txt', 'r') as file:
+    with open('diagrams.txt', 'r') as file:
         data = file.readlines()
     
     for line in data:
@@ -99,7 +99,7 @@ def main():
             latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0)
             
         
-            with open('main.tex', 'w') as f:
+            with open('/main.tex', 'w') as f:
                 f.write(latex_start + latex_hasse_diagrams + latex_end)
                 
         with open('latex_errors.log', 'w') as error_log:

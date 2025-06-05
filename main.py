@@ -12,6 +12,8 @@ def main():
     sdg = SoutheastDiagramGenerator(4)
     sdg.generate()
     
+    draw_full_poset = False
+    
     #get all Kohnert diagrams from diagrams.txt
     diagrams = []
     with open('diagrams.txt', 'r') as file:
@@ -108,10 +110,12 @@ def main():
             with open('output.txt', 'w') as f:
                  f.write(kohnert_results)
                  
-            #significatly faster to comment out the writing and compiling of latex     
-            #renderer.set_node_positions(graph)
-            #latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0, False, kohnert_poset.is_ranked())
-            latex_initial_diagrams += renderer.generate_initial_diagrams(D_0, kohnert_poset.is_bounded(), kohnert_poset.is_ranked())
+            #significatly faster to comment out the writing and compiling of latex 
+            if draw_full_poset: 
+                renderer.set_node_positions(graph)
+                latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0, False, kohnert_poset.is_ranked())
+            if not draw_full_poset:
+                latex_initial_diagrams += renderer.generate_initial_diagrams(D_0, kohnert_poset.is_bounded(), kohnert_poset.is_ranked())
             progress.print_progress(index)
     print() 
             

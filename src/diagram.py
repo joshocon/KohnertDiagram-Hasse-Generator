@@ -12,7 +12,7 @@ class Diagram:
         self.row_num = row_num
         self.col_num = col_num
         self.key = None
-        self.row_weight = self.get_row_weight()
+        self.row_weight = []
 
     # gives diagram a unique key
     def generate_diagram_key(self, cells):
@@ -22,12 +22,13 @@ class Diagram:
 
     def get_row_weight(self):
         weight = {}
-        for r,c in self.cells:
-            r = int(r)  # Ensure r is int
-            weight[r] = weight.get(r, 0) + 1
+        if self.cells != []:
+            for r,c in self.cells:
+                r = int(r)  # Ensure r is int
+                weight[r] = weight.get(r, 0) + 1
 
-        max_row = max(weight.keys(), default=0)
-        row_weight = [weight.get(r, 0) for r in range(1, max_row + 1)]
+            max_row = max(weight.keys(), default=0)
+            row_weight = [weight.get(r, 0) for r in range(1, max_row + 1)]
         
         return row_weight
 

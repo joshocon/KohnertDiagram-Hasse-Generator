@@ -75,7 +75,7 @@ class LaTeXRenderer:
                     monomial += f'x_{i+1}^{row_weight[i]}'
         return monomial
 
-    def generate_hasse_diagram(self, graph, root):
+    def generate_hasse_diagram(self, graph, root, is_bounded, is_ranked):
 
         figure_start_str = (
             r'\begin{figure}[ht]\centering\begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]'
@@ -96,10 +96,10 @@ class LaTeXRenderer:
 
             diagram.key = diagram.generate_diagram_key(diagram.cells)
             self.set_diagram_tex(node)
-            monomial = self.get_monomial_string(diagram.get_row_weight())
+            #monomial = self.get_monomial_string(diagram.get_row_weight())
 
             vertices.append(node.tex_string)
-            polynomial.append(monomial)
+            #polynomial.append(monomial)
 
             for neighbor in graph.get_neighbors(node):
                 dfs(neighbor)
@@ -107,10 +107,9 @@ class LaTeXRenderer:
         dfs(root)
 
         edges = self.draw_edges(graph)
-        kohnert_poset = Poset(graph)
         figure_end_str = (
             rf"\end{{tikzpicture}}"
-            rf"\caption{{\label{{fig:poset}}Hasse Diagram of $D_0 = \{{{root.entry.cells}\}}$. Bounded: {kohnert_poset.is_bounded()}. Ranked: {kohnert_poset.is_ranked()} }}" # with Kohnert Polynomial \\"
+            rf"\caption{{\label{{fig:poset}}Hasse Diagram of $D_0 = \{{{root.entry.cells}\}}$. Bounded: {is_bounded}. Ranked: {is_ranked} }}" # with Kohnert Polynomial \\"
             #rf"\begin{{tiny}}${{{'+'.join(polynomial)}}}$ \end{{tiny}}"
             rf"\end{{figure}}"
             rf"\pagebreak"
@@ -123,3 +122,25 @@ class LaTeXRenderer:
             + '\n'
             + figure_end_str
         )
+        
+    def generate_initial_diagrams(self, root, is_bounded, is_ranked):
+        figure_start_str = (
+            r'\begin{figure}[ht]\centering\begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]'
+            + '\n'
+        )
+        diagram = root.entry
+        
+        diagram.key = diagram.generate_diagram_key(diagram.cells)
+        self.set_node_position(root, 0, 0)
+        self.set_diagram_tex(root)
+        
+        figure_end_str = (
+            rf"\end{{tikzpicture}}"
+            rf"\caption{{\label{{fig:poset}}Hasse Diagram of $D_0 = \{{{root.entry.cells}\}}$. Bounded: {is_bounded}. Ranked: {is_ranked} }}" # with Kohnert Polynomial \\"
+            #rf"\begin{{tiny}}${{{'+'.join(polynomial)}}}$ \end{{tiny}}"
+            rf"\end{{figure}}"
+            rf"\pagebreak"
+        )
+        
+        return figure_start_str + root.tex_string + figure_end_str
+        

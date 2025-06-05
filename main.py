@@ -4,11 +4,14 @@ University of Kansas
 McNair Scholar's Program 2025
 '''
 
-from src import Diagram, Graph, DiagramEngine, LaTeXRenderer, Poset
+from src import Diagram, Graph, DiagramEngine, LaTeXRenderer, Poset, SoutheastDiagramGenerator, ProgessBar
 import subprocess
 
 
 def main():
+    sdg = SoutheastDiagramGenerator(4)
+    sdg.generate()
+    
     #get all Kohnert diagrams from diagrams.txt
     diagrams = []
     with open('diagrams.txt', 'r') as file:
@@ -66,10 +69,16 @@ def main():
     \maketitle '''
     latex_hasse_diagrams = ''
     latex_end = '\end{document}'
+    
+    latex_initial_diagrams = ''
+    
+    kohnert_results = ''
+    
+    progress = ProgessBar(len(diagrams))
         
     file = open('main.tex', 'r')
-    
-    for cells in diagrams:
+
+    for index, cells in enumerate(diagrams, 1):
         graph = Graph()
         engine = DiagramEngine()
         renderer = LaTeXRenderer()
@@ -83,8 +92,8 @@ def main():
         if diagram.cells == []:
             print('Error')
         
-        elif engine.check_south_east(diagram.cells) == False:
-            print('Not Southeast')
+        #elif engine.check_south_east(diagram.cells) == False:
+            #print('Not Southeast')
         
         #if the diagram is valid, we continue
         else:
@@ -93,21 +102,26 @@ def main():
             for move_pair in move_cells:
                 engine.kohnert_move(graph, diagram, move_pair, cache)
             
-            #significatly faster to comment out the writing and compiling of latex - the print messages will be enough information for most cases
-            renderer.set_node_positions(graph)
-            latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0)
-            
-        
-            with open('main.tex', 'w') as f:
-                f.write(latex_start + latex_hasse_diagrams + latex_end)
-                
-            with open('latex_errors.log', 'w') as error_log:
-                subprocess.run(['pdflatex', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
-            
             kohnert_poset = Poset(graph)
-            print(kohnert_poset.result())
+            kohnert_results += kohnert_poset.result() + '\n'
             
-        file.close
+            with open('output.txt', 'w') as f:
+                 f.write(kohnert_results)
+                 
+            #significatly faster to comment out the writing and compiling of latex     
+            #renderer.set_node_positions(graph)
+            #latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0, False, kohnert_poset.is_ranked())
+            latex_initial_diagrams += renderer.generate_initial_diagrams(D_0, kohnert_poset.is_bounded(), kohnert_poset.is_ranked())
+            progress.print_progress(index)
+    print() 
+            
+    with open('main.tex', 'w') as f:
+                f.write(latex_start + latex_initial_diagrams + latex_end)
+                    
+    with open('latex_errors.log', 'w') as error_log:
+                subprocess.run(['pdflatex','-interaction=nonstopmode', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
+            
+    file.close
         
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ class Diagram:
         self.col_num = col_num
         self.key = None
         self.row_weight = []
+        self.monomial = ''
 
     # gives diagram a unique key
     def generate_diagram_key(self, cells):
@@ -31,6 +32,16 @@ class Diagram:
             row_weight = [weight.get(r, 0) for r in range(1, max_row + 1)]
         
         return row_weight
+    
+    def get_monomial(self):
+        monomial = ''
+        for i in range(len(self.row_weight)):
+            if self.row_weight[i] != 0:
+                if self.row_weight[i] == 1:
+                    monomial += f'x_{i+1}'
+                else:
+                    monomial += f'x_{i+1}^{self.row_weight[i]}'
+        return monomial
 
     def get_row_number(self):
         return self.row_num
@@ -46,6 +57,3 @@ class Diagram:
 
     def __repr__(self):
         return f'{self.cells}'
-    
-    
-

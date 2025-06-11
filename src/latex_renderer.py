@@ -6,7 +6,7 @@ McNair Scholar's Program 2025
 
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
-from .poset import Poset
+from .kohnert_poset import KohnertPoset
 
 class LaTeXRenderer:
     def __init__(self):
@@ -64,18 +64,8 @@ class LaTeXRenderer:
                     rf'\draw ({parent.entry.key}) -- ({child.entry.key});'
                 )
         return '\n'.join(draw_lines)
-    
-    def get_monomial_string(self, row_weight):
-        monomial = ''
-        for i in range(len(row_weight)):
-            if row_weight[i] != 0:
-                if row_weight[i] == 1:
-                    monomial += f'x_{i+1}'
-                else:
-                    monomial += f'x_{i+1}^{row_weight[i]}'
-        return monomial
 
-    def generate_hasse_diagram(self, graph, root, is_bounded, is_ranked):
+    def generate_hasse_diagram(self, graph, root, result):
 
         figure_start_str = (
             r'\begin{figure}[ht]\centering\begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]'
@@ -83,9 +73,7 @@ class LaTeXRenderer:
         )
         
         vertices = []
-        polynomial = []
         seen = set()
-        #polynomial
         
         def dfs(node):
             diagram = node.entry
@@ -96,10 +84,7 @@ class LaTeXRenderer:
 
             diagram.key = diagram.generate_diagram_key(diagram.cells)
             self.set_diagram_tex(node)
-            #monomial = self.get_monomial_string(diagram.get_row_weight())
-
             vertices.append(node.tex_string)
-            #polynomial.append(monomial)
 
             for neighbor in graph.get_neighbors(node):
                 dfs(neighbor)
@@ -109,8 +94,7 @@ class LaTeXRenderer:
         edges = self.draw_edges(graph)
         figure_end_str = (
             rf"\end{{tikzpicture}}"
-            rf"\caption{{\label{{fig:poset}}Hasse Diagram of $D_0 = \{{{root.entry.cells}\}}$. Bounded: {is_bounded}. Ranked: {is_ranked} }}" # with Kohnert Polynomial \\"
-            #rf"\begin{{tiny}}${{{'+'.join(polynomial)}}}$ \end{{tiny}}"
+            rf"\caption{{\label{{fig:poset}}{result}}}"
             rf"\end{{figure}}"
             rf"\pagebreak"
         )
@@ -123,7 +107,7 @@ class LaTeXRenderer:
             + figure_end_str
         )
         
-    def generate_initial_diagrams(self, root, is_bounded, is_ranked):
+    def generate_initial_diagrams(self, root, result):
         figure_start_str = (
             r'\begin{figure}[ht]\centering\begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]'
             + '\n'
@@ -136,11 +120,9 @@ class LaTeXRenderer:
         
         figure_end_str = (
             rf"\end{{tikzpicture}}"
-            rf"\caption{{\label{{fig:poset}}Hasse Diagram of $D_0 = \{{{root.entry.cells}\}}$. Bounded: {is_bounded}. Ranked: {is_ranked} }}" # with Kohnert Polynomial \\"
-            #rf"\begin{{tiny}}${{{'+'.join(polynomial)}}}$ \end{{tiny}}"
+            rf"\caption{{\label{{fig:poset}}{result}}}"
             rf"\end{{figure}}"
             rf"\pagebreak"
         )
         
         return figure_start_str + root.tex_string + figure_end_str
-        

@@ -29,6 +29,17 @@ class DiagramEngine:
                 ) not in cells_set:
                     return False
         return True
+    
+    def check_north_east(self, cells):
+        cells_set = set(cells)
+        for i in range(len(cells)):
+            for j in range(i + 1, len(cells)):
+                if (
+                    max(cells[i][0], cells[j][0]),
+                    max(cells[i][1], cells[j][1]),
+                ) not in cells_set:
+                    return False
+        return True
 
     def find_move_cells(self, D):
         diagram = D
@@ -80,4 +91,3 @@ class DiagramEngine:
                 new_move_cells = self.find_move_cells(new_diagram)
                 for new_move_pair in new_move_cells:
                     self.kohnert_move(graph, new_diagram, new_move_pair, cache)
-

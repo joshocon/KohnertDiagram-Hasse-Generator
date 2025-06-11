@@ -4,27 +4,29 @@ University of Kansas
 McNair Scholar's Program 2025
 '''
 
-from src import Diagram, Graph, DiagramEngine, LaTeXRenderer, Poset, SoutheastDiagramGenerator, ProgessBar
+from src import Diagram, Graph, DiagramEngine, LaTeXRenderer, KohnertPoset, SoutheastDiagramGenerator, ProgessBar
 import subprocess
-
+import itertools
+import ast
 
 def main():
-    sdg = SoutheastDiagramGenerator(4)
-    sdg.generate()
+    sdg = SoutheastDiagramGenerator()
+    #sdg.generate(n) #generates all nxn southeast diagrams and writes it to diagrams.txt
     
     draw_full_poset = False
-    
-    #get all Kohnert diagrams from diagrams.txt
+
     diagrams = []
     with open('diagrams.txt', 'r') as file:
         data = file.readlines()
     
     for line in data:
         raw_cells = line.strip().split(' ')
-        cells = [eval(cell) for cell in raw_cells ]
-        diagrams.append(cells)
+        cells = [ast.literal_eval(cell) for cell in raw_cells ]
+        diagrams.append(sdg.normalize_cells(cells))
         
-    #latex boilerplate
+    diagrams.sort(key=len)
+    diagrams = list(item for item,_ in itertools.groupby(diagrams))
+    
     latex_start = r'''
     \documentclass{article}
     \usepackage{graphicx, geometry, amsmath, amsfonts, tikz, youngtab, cite}
@@ -69,16 +71,12 @@ def main():
     \title{Code Generation of Posets}
     \begin{document}
     \maketitle '''
-    latex_hasse_diagrams = ''
+    latex_hasse_diagrams = []
+    latex_initial_diagrams = []
+    kohnert_results = []
     latex_end = '\end{document}'
     
-    latex_initial_diagrams = ''
-    
-    kohnert_results = ''
-    
     progress = ProgessBar(len(diagrams))
-        
-    file = open('main.tex', 'r')
 
     for index, cells in enumerate(diagrams, 1):
         graph = Graph()
@@ -95,7 +93,7 @@ def main():
             print('Error')
         
         #elif engine.check_south_east(diagram.cells) == False:
-            #print('Not Southeast')
+            #print(f'\nNot Southeast: {diagram.cells}')
         
         #if the diagram is valid, we continue
         else:
@@ -104,29 +102,30 @@ def main():
             for move_pair in move_cells:
                 engine.kohnert_move(graph, diagram, move_pair, cache)
             
-            kohnert_poset = Poset(graph)
-            kohnert_results += kohnert_poset.result() + '\n'
-            
-            with open('output.txt', 'w') as f:
-                 f.write(kohnert_results)
-                 
-            #significatly faster to comment out the writing and compiling of latex 
-            if draw_full_poset: 
-                renderer.set_node_positions(graph)
-                latex_hasse_diagrams += renderer.generate_hasse_diagram(graph, D_0, False, kohnert_poset.is_ranked())
-            if not draw_full_poset:
-                latex_initial_diagrams += renderer.generate_initial_diagrams(D_0, kohnert_poset.is_bounded(), kohnert_poset.is_ranked())
+            kohnert_poset = KohnertPoset(graph)
+    
+            if not kohnert_poset.is_simple(): #if the initial diagram has no possible kohnert moves
+                result = kohnert_poset.result()
+                kohnert_results.append(result)
+                    
+                if draw_full_poset: 
+                    renderer.set_node_positions(graph)
+                    latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
+                    
+                if not draw_full_poset:
+                    latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
+                
             progress.print_progress(index)
     print() 
-            
+    
+    with open('output.txt', 'w') as f:
+                f.write('\n'.join(kohnert_results))
+    
     with open('main.tex', 'w') as f:
-                f.write(latex_start + latex_initial_diagrams + latex_end)
+                f.write(latex_start + '\n'.join(latex_hasse_diagrams) + '\n'.join(latex_initial_diagrams) + latex_end)
                     
     with open('latex_errors.log', 'w') as error_log:
                 subprocess.run(['pdflatex','-interaction=nonstopmode', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
-            
-    file.close
-        
 
 if __name__ == '__main__':
     main()

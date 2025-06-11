@@ -1,10 +1,15 @@
-class Poset:
+'''
+Josh O'Connor
+University of Kansas
+McNair Scholar's Program 2025
+'''
+
+class KohnertPoset:
     def __init__(self, graph):
         self.maximal_element = graph.get_root_node()
         self.relations = graph
         self.minimal_elements = self._find_minimal_elements()
         self.maximal_chains = self._find_all_maximal_chains()
-        
         
     def _find_minimal_elements(self):
         graph = self.relations
@@ -50,5 +55,9 @@ class Poset:
         graph = self.relations
         res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}. Ranked: {self.is_ranked()}'
         return res
-
-            
+    
+    def is_simple(self):
+        return len(self.maximal_chains[0]) == 1 and len(self.maximal_chains) == 1
+    
+    def is_monomial_multiplicity_free(self, polynomial):
+        return all(monomial_multiplicity == 1 for monomial_multiplicity in polynomial.items())

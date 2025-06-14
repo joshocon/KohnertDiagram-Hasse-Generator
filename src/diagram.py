@@ -63,8 +63,8 @@ class Diagram:
         good_trios = self.condition_a_and_b()
         failed = []
 
-        if self.cells == []:
-            return failed.append('Empty')
+        if len(self.cells) == 1:
+            return failed.append('Trival')
 
         for trio in good_trios:
             if not self.condition_c(trio):
@@ -101,10 +101,10 @@ class Diagram:
         return [list(t) for t in set(satisfied)]
 
     def condition_c(self, trio):
-        #for all columns c1 < c < c2 cwt(D0)_c < cwt(D0)_{c2}
+        #for all columns c2 != c != c1 cwt(D0)_c < cwt(D0)_{c2}
         r1,c1 = trio[0]
         r2,c2 = trio[1]
-        return all(self.column_weight[c] < self.column_weight[c2] for c in range(c1 + 1, c2))
+        return all(self.column_weight[c] < self.column_weight[c2] and c != c1 and c != c2 for c in range(self.col_num))
     
     def condition_d(self, trio):
         #at least one empty space in each c1 <= c <= c2 

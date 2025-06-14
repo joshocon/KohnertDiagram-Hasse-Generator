@@ -104,7 +104,7 @@ class Diagram:
         #for all columns c2 != c != c1 cwt(D0)_c < cwt(D0)_{c2}
         r1,c1 = trio[0]
         r2,c2 = trio[1]
-        return all(self.column_weight[c] < self.column_weight[c2] and c != c1 and c != c2 for c in range(self.col_num))
+        return all(self.column_weight[c] < self.column_weight[c2]  for c in range(self.col_num) if c2 != c != c1)
     
     def condition_d(self, trio):
         #at least one empty space in each c1 <= c <= c2 

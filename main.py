@@ -8,12 +8,12 @@ from src import Diagram, Graph, DiagramEngine, LaTeXRenderer, KohnertPoset, Sout
 import subprocess
 import itertools
 import ast
-
+    
 def main():
     sdg = SoutheastDiagramGenerator()
-    #sdg.generate(n) #generates all nxn southeast diagrams and writes it to diagrams.txt
+    #sdg.generate(5) #generates all nxn southeast diagrams and writes it to diagrams.txt
     
-    draw_full_poset = False
+    draw_full_poset = True
 
     diagrams = []
     with open('diagrams.txt', 'r') as file:
@@ -104,18 +104,23 @@ def main():
             
             kohnert_poset = KohnertPoset(graph)
     
-            if not kohnert_poset.is_simple(): #if the initial diagram has no possible kohnert moves
+            if True:#not kohnert_poset.is_simple(): #if the initial diagram has no possible kohnert moves
                 result = kohnert_poset.result()
-                kohnert_results.append(result)
+                test = diagram.test_conjecture()
                     
+                with open('output.txt', 'a') as f:
+                    f.write(f'{result} ||| Conjecture Result: {test}\n')
+                
+                kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
+                
                 if draw_full_poset: 
                     renderer.set_node_positions(graph)
                     latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
                     
                 if not draw_full_poset:
                     latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
-                
-            progress.print_progress(index)
+                    
+            #progress.print_progress(index)
     print() 
     
     with open('output.txt', 'w') as f:

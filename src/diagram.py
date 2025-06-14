@@ -62,6 +62,10 @@ class Diagram:
     def test_conjecture(self):
         good_trios = self.condition_a_and_b()
         failed = []
+
+        if self.cells == []:
+            return failed.append('Empty')
+
         for trio in good_trios:
             if not self.condition_c(trio):
                 failed.append('C')
@@ -80,7 +84,7 @@ class Diagram:
 
 
     def condition_a_and_b(self):
-        #three cells such that r1 <= r2 < r3 and c1 < c2 = c3
+        #three cells such that r1 = r2 < r3 and c1 < c2 = c3
         satisfied = []
         n = len(self.zero_index)
         for i in range(n):
@@ -92,7 +96,7 @@ class Diagram:
                     #make sure all cells are unique
                     if len({(r1,c1), (r2,c2), (r3,c3)}) != 3:
                         continue
-                    if r1 <= r2 < r3 and c1 < c2 == c3:
+                    if r1 == r2 < r3 and c1 < c2 == c3:
                         satisfied.append(tuple(sorted([(r1, c1), (r2, c2), (r3, c3)])))
         return [list(t) for t in set(satisfied)]
 
@@ -103,6 +107,7 @@ class Diagram:
         return all(self.column_weight[c] < self.column_weight[c2] for c in range(c1 + 1, c2))
     
     def condition_d(self, trio):
+        #at least one empty space in each c1 <= c <= c2 
         r1,c1 = trio[0]
         r2,c2 = trio[1]
         for c in range(c1, c2 + 1):
@@ -114,23 +119,17 @@ class Diagram:
             if not found_empty:
                 return False
         return True
-
     
     def condition_e(self, trio):
-        #for c_2 < c cwt(D0)_c < cwt(D0)_{c2}
-        cwt = self.column_weight
-        r2,c2 = trio[1]
-        for c in range(c2 + 1, self.col_num):
-            print(c, cwt)
-            if cwt[c] >= cwt[c2]:
-                return False
-        return True
-    
-    def condition_f(self, trio):
         #the cell (r1,c2 + 1) not in the diagram
         r1,c1 = trio[0]
         r2,c2 = trio[1]
         return (r1, c2 + 1) not in self.zero_index
+    
+    def condition_f(self, trio):
+        #for r > r1 the cell (r,c1) not in the diagram
+        r1,c1 = trio[0]
+        return not any((r,c1) in self.zero_index and r1 < r for (r,c) in self.zero_index)
     
     def get_row_number(self):
         return self.row_num

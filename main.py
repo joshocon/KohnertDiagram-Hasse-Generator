@@ -13,7 +13,7 @@ def main():
     sdg = SoutheastDiagramGenerator()
     #sdg.generate(5) #generates all nxn southeast diagrams and writes it to diagrams.txt
     
-    draw_full_poset = True
+    draw_full_poset = False
 
     diagrams = []
     with open('diagrams.txt', 'r') as file:
@@ -113,12 +113,12 @@ def main():
                 
                 kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
                 
-                # if draw_full_poset: 
-                #     renderer.set_node_positions(graph)
-                #     latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
+                if draw_full_poset: 
+                    renderer.set_node_positions(graph)
+                    latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
                     
-                # if not draw_full_poset:
-                #     latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
+                if not draw_full_poset:
+                    latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
                     
             progress.print_progress(index)
     print() 

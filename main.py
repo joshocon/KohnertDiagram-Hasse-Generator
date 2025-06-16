@@ -105,21 +105,20 @@ def main():
             
             kohnert_poset = KohnertPoset(graph)
     
-            if True:#not kohnert_poset.is_simple(): #if the initial diagram has no possible kohnert moves
-                result = kohnert_poset.result()
-                test = diagram.test_conjecture()
-                    
-                with open('output.txt', 'a') as f:
-                    f.write(f'{result} ||| Conjecture Result: {test}\n')
+            result = kohnert_poset.result()
+            test = diagram.test_conjecture()
                 
-                kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
+            with open('output.txt', 'a') as f:
+                f.write(f'{result} ||| Conjecture Result: {test}\n')
+            
+            kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
+            
+            if draw_full_poset: 
+                renderer.set_node_positions(graph)
+                latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
                 
-                # if draw_full_poset: 
-                #     renderer.set_node_positions(graph)
-                #     latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
-                    
-                if not draw_full_poset:
-                     latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
+            if not draw_full_poset:
+                 latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
                     
             progress.print_progress(index)
     print() 

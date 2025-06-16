@@ -8,6 +8,6 @@ __pycache__/
 *.tex
 
 .DS_Store
-\outputs
+outputs
 diagrams.txt
 output.txt

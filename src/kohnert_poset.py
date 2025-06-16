@@ -9,7 +9,7 @@ class KohnertPoset:
         self.maximal_element = graph.get_root_node()
         self.relations = graph
         self.minimal_elements = self._find_minimal_elements()
-        self.maximal_chains = self._find_all_maximal_chains()
+        self.maximal_chains = 1
         
     def _find_minimal_elements(self):
         graph = self.relations
@@ -53,7 +53,7 @@ class KohnertPoset:
     
     def result(self):
         graph = self.relations
-        res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}. Ranked: {self.is_ranked()}'
+        res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}'#. Ranked: {self.is_ranked()}'
         return res
     
     def is_simple(self):

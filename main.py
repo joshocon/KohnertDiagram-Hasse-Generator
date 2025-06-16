@@ -19,6 +19,7 @@ def main():
     with open('diagrams.txt', 'r') as file:
         data = file.readlines()
     
+    
     for line in data:
         raw_cells = line.strip().split(' ')
         cells = [ast.literal_eval(cell) for cell in raw_cells ]
@@ -92,8 +93,8 @@ def main():
         if diagram.cells == []:
             print('Error')
         
-        #elif engine.check_south_east(diagram.cells) == False:
-            #print(f'\nNot Southeast: {diagram.cells}')
+        elif engine.check_south_east(diagram.cells) == False:
+            print(f'\nNot Southeast: {diagram.cells}')
         
         #if the diagram is valid, we continue
         else:
@@ -117,8 +118,8 @@ def main():
                 #     renderer.set_node_positions(graph)
                 #     latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
                     
-                # if not draw_full_poset:
-                #     latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
+                if not draw_full_poset:
+                     latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
                     
             progress.print_progress(index)
     print() 

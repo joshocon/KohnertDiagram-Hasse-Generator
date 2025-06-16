@@ -9,7 +9,6 @@ class KohnertPoset:
         self.maximal_element = graph.get_root_node()
         self.relations = graph
         self.minimal_elements = self._find_minimal_elements()
-        self.maximal_chains = 1
         
     def _find_minimal_elements(self):
         graph = self.relations
@@ -19,24 +18,45 @@ class KohnertPoset:
                 minimal_elements.append(vertex)
         return minimal_elements
     
-    def _find_all_maximal_chains(self):
+    def _is_ranked(self):
+        from collections import defaultdict, deque
+
+        in_degree = defaultdict(int)
+        rank = {}
+        neighbors = defaultdict(list)
         graph = self.relations
-        root = graph.get_root_node()
-        minimal_elements = self.get_minimal_elements()
 
-        all_paths = []
+        for u in graph.get_vertices():
+            for v in graph.get_neighbors(u):  
+                neighbors[u].append(v)
+                in_degree[v] += 1
 
-        def dfs(node, path=[]):
-            if node in minimal_elements:
-                all_paths.append(list(reversed(path + [node])))
-                return
-            if node not in graph.get_vertices():
-                return
-            for neighbor in graph.get_neighbors(node):
-                dfs(neighbor, path + [node])
+        queue = deque()
+        for v in graph.get_vertices():
+            if in_degree[v] == 0:
+                rank[v] = 0
+                queue.append(v)
 
-        dfs(root)
-        return all_paths
+        while queue:
+            u = queue.popleft()
+            for v in neighbors[u]:
+                expected_rank = rank[u] + 1
+                if v in rank:
+                    if rank[v] != expected_rank:
+                        return False 
+                else:
+                    rank[v] = expected_rank
+
+                in_degree[v] -= 1
+                if in_degree[v] == 0:
+                    queue.append(v)
+
+        max_ranks = set()
+        for v in graph.get_vertices():
+            if not neighbors[v]: 
+                max_ranks.add(rank[v])
+
+        return len(max_ranks) == 1
     
     def get_minimal_elements(self):
         return self.minimal_elements
@@ -48,12 +68,11 @@ class KohnertPoset:
         return len(self.minimal_elements) == 1
 
     def is_ranked(self):
-        expected_length = len(self.maximal_chains[0])
-        return all(len(chain) == expected_length for chain in self.maximal_chains)
+        return self._is_ranked()
     
     def result(self):
         graph = self.relations
-        res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}'#. Ranked: {self.is_ranked()}'
+        res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}. Ranked: {self.is_ranked()}'
         return res
     
     def is_simple(self):

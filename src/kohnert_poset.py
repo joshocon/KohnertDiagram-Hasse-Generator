@@ -3,12 +3,16 @@ Josh O'Connor
 University of Kansas
 McNair Scholar's Program 2025
 '''
+from collections import defaultdict
+
 
 class KohnertPoset:
     def __init__(self, graph):
         self.maximal_element = graph.get_root_node()
         self.relations = graph
         self.minimal_elements = self._find_minimal_elements()
+        self.monomial_dict = defaultdict(int)
+        self.kohnert_polynomial = ''
         
     def _find_minimal_elements(self):
         graph = self.relations
@@ -58,6 +62,28 @@ class KohnertPoset:
 
         return len(max_ranks) == 1
     
+    def _get_monomial_dict(self):
+        
+        root = self.maximal_element
+        seen = set()
+        
+        def dfs(node):
+            diagram = node.entry
+            frozen = frozenset(diagram.cells)
+            if frozen in seen:
+                return
+            seen.add(frozen)
+
+            self.monomial_dict[diagram.monomial] += 1
+
+            for neighbor in self.relations.get_neighbors(node):
+                dfs(neighbor)
+                
+        dfs(root)
+        
+        print(self.monomial_dict)
+        
+    
     def get_minimal_elements(self):
         return self.minimal_elements
     
@@ -70,13 +96,34 @@ class KohnertPoset:
     def is_ranked(self):
         return self._is_ranked()
     
-    def result(self):
-        graph = self.relations
-        res = f'Hasse Diagram of {graph.get_root_node().entry.cells}. Bounded: {self.is_bounded()}. Ranked: {self.is_ranked()}'
+    def is_monomial_multiplicity_free(self):
+        self._get_monomial_dict()
+        res = True
+        terms = []
+
+        for key, value in self.monomial_dict.items():
+            if value != 1:
+                terms.append(f"{value}{key}")
+                res = False
+            else:
+                terms.append(f"{key}")
+
+        self.kohnert_polynomial = " + ".join(terms)
+        return res
+
+                
+    
+    def boundedness_result(self):
+        res = f'Hasse Diagram of {self.maximal_element.entry.cells}. Bounded: {self.is_bounded()}'
+        return res
+    
+    def rankedness_result(self):
+        res = f'Hasse Diagram of {self.maximal_element.entry.cells}. Ranked: {self.is_ranked()}'
+        return res
+    
+    def monomial_multiplicity_free_result(self):
+        res = f'Hasse Diagram of {self.maximal_element.entry.cells} (Polynomial: {self.kohnert_polynomial}). MMF: {self.is_monomial_multiplicity_free()}'
         return res
     
     def is_simple(self):
         return len(self.maximal_chains[0]) == 1 and len(self.maximal_chains) == 1
-    
-    def is_monomial_multiplicity_free(self, polynomial):
-        return all(monomial_multiplicity == 1 for monomial_multiplicity in polynomial.items())

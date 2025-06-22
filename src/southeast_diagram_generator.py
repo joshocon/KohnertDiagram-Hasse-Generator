@@ -6,7 +6,7 @@ McNair Scholar's Program 2025
 
 class SoutheastDiagramGenerator:
     def __init__(self):
-        self.dimension = 1
+        self.dimensions = (1,1)
         self.sets = [[]]
         self.all_cells = []
         
@@ -33,13 +33,13 @@ class SoutheastDiagramGenerator:
                     self.sets.add(frozenset(new_diagram))
     
     def get_all_cells(self):
-        for i in range(1, self.dimension + 1):
-            for j in range(self.dimension, 0, -1):
+        for i in range(1, self.dimensions[0] + 1):
+            for j in range(self.dimensions[1], 0, -1):
                 new_cell = (i,j)
                 self.all_cells.append(new_cell)
                 
-    def generate(self, dimension):
-        self.dimension = dimension
+    def generate(self, x,y):
+        self.dimensions = (x,y)
         self.get_all_cells()
         self._generate(self.all_cells)
         with open("diagrams.txt", "w") as f:

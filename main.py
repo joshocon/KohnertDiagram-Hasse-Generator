@@ -6,28 +6,34 @@ McNair Scholar's Program 2025
 
 from src import Diagram, Graph, DiagramEngine, LaTeXRenderer, KohnertPoset, SoutheastDiagramGenerator, ProgessBar
 import subprocess
-import itertools
 import ast
-    
+
 def main():
     sdg = SoutheastDiagramGenerator()
-    #sdg.generate(5) #generates all nxn southeast diagrams and writes it to diagrams.txt
+    #sdg.generate(4,4) #generates all nxn southeast diagrams and writes it to diagrams.txt
     
+    def ask_bool(prompt):
+        return input(prompt + " (y/n): ").strip().lower() == 'y'
+
+    compile_latex = ask_bool("Compile LaTeX?")
     draw_full_poset = False
+    if compile_latex:
+        draw_full_poset = ask_bool("Draw full poset?")
+    
+    test_boundedness = ask_bool("Test boundedness?")
+    test_rankedness = ask_bool("Test rankedness?")
+    test_monomial_multiplicity_free = ask_bool("Test monomial multiplicity-freeness?")
+
 
     diagrams = []
     with open('diagrams.txt', 'r') as file:
         data = file.readlines()
-    
     
     for line in data:
         raw_cells = line.strip().split(' ')
         cells = [ast.literal_eval(cell) for cell in raw_cells ]
         diagrams.append(sdg.normalize_cells(cells))
         
-    diagrams.sort(key=len)
-    diagrams = list(item for item,_ in itertools.groupby(diagrams))
-    
     latex_start = r'''
     \documentclass{article}
     \usepackage{graphicx, geometry, amsmath, amsfonts, tikz, youngtab, cite}
@@ -85,52 +91,81 @@ def main():
         renderer = LaTeXRenderer()
         
         row_num, col_num = engine.get_dimension(cells)
-        diagram = Diagram(list(cells), row_num, col_num)  # init diagram
-        graph.add_vertex(diagram) #add "root" to graph
+        diagram = Diagram(list(cells), row_num, col_num) 
+        graph.add_vertex(diagram) 
         D_0 = graph.get_root_node()
         
-        #if the diagram is invalid or not southeast then quit
         if diagram.cells == []:
             print('Error')
         
         elif engine.check_south_east(diagram.cells) == False:
             print(f'\nNot Southeast: {diagram.cells}')
         
-        #if the diagram is valid, we continue
         else:
-            cache = {}  # cache Kohnert diagrams
-            move_cells = engine.find_move_cells(diagram)  # find cells eligible for Kohnert move
+            cache = {} 
+            move_cells = engine.find_move_cells(diagram)
             for move_pair in move_cells:
                 engine.kohnert_move(graph, diagram, move_pair, cache)
             
             kohnert_poset = KohnertPoset(graph)
-    
-            result = kohnert_poset.result()
-            test = diagram.test_conjecture()
+
+            if test_boundedness:
+                result = kohnert_poset.boundedness_result()
+                test = diagram.test_bounded_conjecture()
                 
-            with open('output.txt', 'a') as f:
-                f.write(f'{result} ||| Conjecture Result: {test}\n')
-            
-            kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
-            
-            if draw_full_poset: 
-                renderer.set_node_positions(graph)
-                latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
+                kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
                 
-            if not draw_full_poset:
-                 latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result))
+            if test_rankedness:
+                result = kohnert_poset.rankedness_result()
+                test = diagram.test_ranked_conjecture()
+                
+                kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
+                
+            if test_monomial_multiplicity_free:
+                result = kohnert_poset.monomial_multiplicity_free_result()
+                test = diagram.test_mmf_conjecture()
+                
+                kohnert_results.append(f'{result}' + f' ||| Conjecture Result: {test}')
+            
+            if compile_latex:
+            
+                if draw_full_poset: 
+                    renderer.set_node_positions(graph)
+                    latex_hasse_diagrams.append(renderer.generate_hasse_diagram(graph, D_0, result))
+                    
+                if not draw_full_poset:
+                    latex_initial_diagrams.append(renderer.generate_initial_diagrams(D_0, result +' | '+ test))
                     
             progress.print_progress(index)
     print() 
     
     with open('output.txt', 'w') as f:
                 f.write('\n'.join(kohnert_results))
-    
-    with open('main.tex', 'w') as f:
-                f.write(latex_start + '\n'.join(latex_hasse_diagrams) + '\n'.join(latex_initial_diagrams) + latex_end)
                     
-    with open('latex_errors.log', 'w') as error_log:
-                subprocess.run(['pdflatex','-interaction=nonstopmode', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
+    failed_conjecture = 0
+    failed_type = {}
+    filter_criteria1 = 'Bounded: True ||| Conjecture Result: M'
+    filter_criteria2 = 'Bounded: False ||| Conjecture Result: F'
+
+    conditions = ['c', 'd', 'e', 'f', 'g', 'h', 'i','j']
+
+    with open('output.txt', 'r') as f:
+        for line in f:
+            if filter_criteria2 in line:
+                failed_conjecture += 1
+                for condition in conditions:
+                    if f"fails {condition.upper()}" in line and 'Bounded: False' in line:
+                        failed_type[condition] = failed_type.get(condition, 0) + 1
+
+    print(f'{failed_conjecture} failed -> {failed_type}')
+    
+    if compile_latex:
+    
+        with open('main.tex', 'w') as f:
+                    f.write(latex_start + '\n'.join(latex_hasse_diagrams) + '\n'.join(latex_initial_diagrams) + latex_end)
+                        
+        with open('latex_errors.log', 'w') as error_log:
+                    subprocess.run(['pdflatex','-interaction=nonstopmode', 'main.tex'], stdout=subprocess.DEVNULL, stderr=error_log)
 
 if __name__ == '__main__':
     main()

@@ -100,15 +100,16 @@ class KohnertPoset:
         self._get_monomial_dict()
         res = True
         terms = []
-
+        print(self.monomial_dict, self.monomial_dict.items())
         for key, value in self.monomial_dict.items():
             if value != 1:
                 terms.append(f"{value}{key}")
                 res = False
             else:
                 terms.append(f"{key}")
-
+        print(terms)
         self.kohnert_polynomial = " + ".join(terms)
+        print(self.kohnert_polynomial)
         return res
 
                 
@@ -122,8 +123,9 @@ class KohnertPoset:
         return res
     
     def monomial_multiplicity_free_result(self):
-        res = f'Hasse Diagram of {self.maximal_element.entry.cells} (Polynomial: {self.kohnert_polynomial}). MMF: {self.is_monomial_multiplicity_free()}'
-        return res
+        res = self.is_monomial_multiplicity_free()
+        return f'Hasse Diagram of {self.maximal_element.entry.cells} (Polynomial: {self.kohnert_polynomial}). MMF: {res}'
+         
     
     def is_simple(self):
         return len(self.maximal_chains[0]) == 1 and len(self.maximal_chains) == 1

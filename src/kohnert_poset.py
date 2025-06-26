@@ -73,15 +73,13 @@ class KohnertPoset:
             if frozen in seen:
                 return
             seen.add(frozen)
-
-            self.monomial_dict[diagram.monomial] += 1
+            monomial = diagram.get_monomial()
+            self.monomial_dict[monomial] += 1
 
             for neighbor in self.relations.get_neighbors(node):
                 dfs(neighbor)
                 
         dfs(root)
-        
-        print(self.monomial_dict)
         
     
     def get_minimal_elements(self):
@@ -100,20 +98,15 @@ class KohnertPoset:
         self._get_monomial_dict()
         res = True
         terms = []
-        print(self.monomial_dict, self.monomial_dict.items())
         for key, value in self.monomial_dict.items():
             if value != 1:
                 terms.append(f"{value}{key}")
                 res = False
             else:
                 terms.append(f"{key}")
-        print(terms)
         self.kohnert_polynomial = " + ".join(terms)
-        print(self.kohnert_polynomial)
         return res
 
-                
-    
     def boundedness_result(self):
         res = f'Hasse Diagram of {self.maximal_element.entry.cells}. Bounded: {self.is_bounded()}'
         return res
@@ -123,8 +116,9 @@ class KohnertPoset:
         return res
     
     def monomial_multiplicity_free_result(self):
-        res = self.is_monomial_multiplicity_free()
-        return f'Hasse Diagram of {self.maximal_element.entry.cells} (Polynomial: {self.kohnert_polynomial}). MMF: {res}'
+        bool = self.is_monomial_multiplicity_free()
+        res = f'Hasse Diagram of {self.maximal_element.entry.cells} (Polynomial: ${self.kohnert_polynomial}$). MMF: {bool}'
+        return res
          
     
     def is_simple(self):

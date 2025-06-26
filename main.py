@@ -10,7 +10,7 @@ import ast
 
 def main():
     sdg = SoutheastDiagramGenerator()
-    #sdg.generate(4,4) #generates all nxn southeast diagrams and writes it to diagrams.txt
+    sdg.generate(5,6) #generates all nxn southeast diagrams and writes it to diagrams.txt
     
     def ask_bool(prompt):
         return input(prompt + " (y/n): ").strip().lower() == 'y'
@@ -142,22 +142,34 @@ def main():
     with open('output.txt', 'w') as f:
                 f.write('\n'.join(kohnert_results))
                     
-    failed_conjecture = 0
-    failed_type = {}
-    filter_criteria1 = 'Bounded: True ||| Conjecture Result: M'
-    filter_criteria2 = 'Bounded: False ||| Conjecture Result: F'
-
-    conditions = ['c', 'd', 'e', 'f', 'g', 'h', 'i','j']
+    failed_to_meet = 0
+    should_not_meet = 0
+    filter_criteria1 = 'True ||| Conjecture Result: M'
+    filter_criteria2 = 'False ||| Conjecture Result: F'
+    output_list = []
 
     with open('output.txt', 'r') as f:
         for line in f:
-            if filter_criteria2 in line:
-                failed_conjecture += 1
-                for condition in conditions:
-                    if f"fails {condition.upper()}" in line and 'Bounded: False' in line:
-                        failed_type[condition] = failed_type.get(condition, 0) + 1
+            start = line.find('[') + 1
+            end = line.find(']')
+            if filter_criteria2 in line or filter_criteria1 in line:
+                if filter_criteria1 in line:
+                    should_not_meet += 1
+                if filter_criteria2 in line: 
+                    failed_to_meet += 1
+                diagram = line[start:end]
+                diagram = diagram.replace('),', ')')
+                diagram = diagram.replace(', ', ',')
+                output_list.append(diagram)
 
-    print(f'{failed_conjecture} failed -> {failed_type}')
+    print(f'{failed_to_meet} failed to meet')
+    print(f'{should_not_meet} should not have met')        
+    output_list.sort(key=len)
+    
+    string = '\n'.join(output_list)
+    
+    with open('formatted.txt', 'w') as f:
+        f.write(string)
     
     if compile_latex:
     

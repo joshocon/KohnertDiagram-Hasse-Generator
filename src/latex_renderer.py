@@ -68,7 +68,7 @@ class LaTeXRenderer:
     def generate_hasse_diagram(self, graph, root, result):
 
         figure_start_str = (
-            r'\begin{figure}[ht]\centering\begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]'
+            r'\begin{figure}[ht]\centering\begin{tikzpicture}[scale=0.5, every node/.style={scale=0.4}]'
             + '\n'
         )
         

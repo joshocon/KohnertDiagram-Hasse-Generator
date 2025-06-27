@@ -10,7 +10,7 @@ import ast
 
 def main():
     sdg = SoutheastDiagramGenerator()
-    sdg.generate(5,6) #generates all nxn southeast diagrams and writes it to diagrams.txt
+    #sdg.generate(4,5) #generates all nxn southeast diagrams and writes it to diagrams.txt
     
     def ask_bool(prompt):
         return input(prompt + " (y/n): ").strip().lower() == 'y'

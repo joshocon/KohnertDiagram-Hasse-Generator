@@ -73,6 +73,7 @@ class KohnertPoset:
             if frozen in seen:
                 return
             seen.add(frozen)
+            diagram.set_row_weight()
             monomial = diagram.get_monomial()
             self.monomial_dict[monomial] += 1
 

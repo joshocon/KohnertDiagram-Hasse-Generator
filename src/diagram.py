@@ -13,17 +13,19 @@ class Diagram:
         self.row_num = row_num
         self.col_num = col_num
         self.key = None
-        self.row_weight = self.get_row_weight()
-        self.column_weight = self.get_column_weight()
+        self.row_weight = None
+        self.column_weight = None
         self.monomial = None
-
+        
+        self.set_column_weight()
+        
     # gives diagram a unique key
     def generate_diagram_key(self, cells):
         sorted_cells = sorted(cells)
         cell_str = str(sorted_cells)
         return hashlib.md5(cell_str.encode()).hexdigest()
 
-    def get_row_weight(self):
+    def set_row_weight(self):
         weight = {}
         if self.cells != []:
             for r,c in self.cells:
@@ -32,10 +34,9 @@ class Diagram:
 
             max_row = max(weight.keys(), default=0)
             row_weight = [weight.get(r, 0) for r in range(1, max_row + 1)]
-        
-        return row_weight
+        self.row_weight = row_weight
     
-    def get_column_weight(self):
+    def set_column_weight(self):
         weight = {}
         if self.cells != []:
             for r, c in self.cells:
@@ -44,13 +45,9 @@ class Diagram:
 
             max_col = max(weight.keys(), default=0)
             column_weight = [weight.get(c, 0) for c in range(1, max_col + 1)]
-        
-        return column_weight
-
+        self.column_weight = column_weight
     
     def get_monomial(self):
-        if self.row_weight is None:
-            self.row_weight = self.get_row_weight()
         monomial = ''
         for i in range(len(self.row_weight)):
             if self.row_weight[i] != 0:
@@ -85,12 +82,6 @@ class Diagram:
             return (list(t) for t in set(satisfied))
 
         def condition_c(trio):
-            # #for columns c1 < c < c2 cwt(D0)c <= cwt(D0)c2
-            # r1,c1 = trio[0]
-            # r2,c2 = trio[1]
-            # return (
-            #     all(self.column_weight[c] <= self.column_weight[c2] for c in range(c1 + 1, c2)) 
-            # )
             return True
     
         def condition_d(trio):
@@ -252,6 +243,7 @@ class Diagram:
             return satisfied
         
         def condition_c(pair):
+            #there are at least two empty spaces beneath every row for c1 <= c <= c2
             r1, c1 = pair[0]
             r2, c2 = pair[1]
 
@@ -279,8 +271,7 @@ class Diagram:
 
             for (r, c) in self.zero_index:
                 if r > max_row and (c == c1 or c == c2):
-                    if c == c1:
-                        return True
+                    if c == c2:
                         return 'Skip'
                     else:
                         return True
@@ -288,12 +279,20 @@ class Diagram:
             return False
                 
         def condition_e(pair):
-            #for c >= c2, cwt(D)c < r2
+            #for c2 < c, cwt(D)c < r2
             r2,c2 = pair[1]
             return all(self.column_weight[c] < r2 for c in range(c2 + 1, self.col_num))
         
         def condition_f(pair):
-            return True
+            #there are more empty spaces under r2 than the column weight of c for c > c2
+            r2,c2 = pair[1]
+            def count_empty(c):
+                count = 0
+                for r in range(r2):
+                    if (r,c) not in self.zero_index:
+                        count += 1
+                return count
+            return all(self.column_weight[c] < count_empty(c2) for c in range(c2 + 1, self.col_num))
         
         good_pairs = condition_a_and_b()
         
@@ -303,6 +302,11 @@ class Diagram:
             d_res = condition_d(pair)
             e_res = condition_e(pair)
             f_res = condition_f(pair)
+            
+            if d_res == 'Skip':
+                return 'Skipped'
+            
+            #print(f'{pair}: {c_res}, {d_res}, {e_res}, {f_res}')
             if c_res:
                 possible_failures.discard('fails C')
             if d_res:
